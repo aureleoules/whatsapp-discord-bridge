@@ -43,6 +43,10 @@ func eventHandler(evt interface{}) {
 			return
 		}
 
+		if v.Message.ReactionMessage != nil {
+			return
+		}
+
 		spew.Dump(v)
 
 		author := &discordgo.MessageEmbedAuthor{
