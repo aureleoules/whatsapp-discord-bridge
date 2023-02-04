@@ -50,9 +50,16 @@ func eventHandler(evt interface{}) {
 			IconURL: "http://s3.cri.epita.fr/cri-intranet/img/blank.jpg",
 		}
 
+		content := v.Message.GetConversation()
 		if v.Info.MediaType == "" {
+			if v.RawMessage.ExtendedTextMessage != nil {
+				if v.RawMessage.ExtendedTextMessage.Text != nil {
+					content = *v.RawMessage.ExtendedTextMessage.Text
+				}
+			}
+
 			discord.ChannelMessageSendEmbed(channelID, &discordgo.MessageEmbed{
-				Description: v.Message.GetConversation(),
+				Description: content,
 				Timestamp:   v.Info.Timestamp.Format("2006-01-02T15:04:05.000Z07:00"),
 				Author:      author,
 				Color:       0x25D366,
@@ -146,6 +153,15 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+	}
+
+	// list groups
+	groups, err := client.GetJoinedGroups()
+	if err != nil {
+		panic(err)
+	}
+	for _, group := range groups {
+		fmt.Println(group.Name, group.JID)
 	}
 
 	err = discord.Open()
