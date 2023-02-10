@@ -35,6 +35,7 @@ func eventHandler(evt interface{}) {
 	case *events.Message:
 		fmt.Println("Received a message!", v.Message.GetConversation())
 
+		spew.Dump(v)
 		if v.Info.Chat.String() != whatsappChannelID {
 			return
 		}
@@ -47,7 +48,7 @@ func eventHandler(evt interface{}) {
 			return
 		}
 
-		spew.Dump(v)
+		fmt.Println("Sending to Discord")
 
 		author := &discordgo.MessageEmbedAuthor{
 			Name:    v.Info.PushName,
@@ -55,7 +56,7 @@ func eventHandler(evt interface{}) {
 		}
 
 		content := v.Message.GetConversation()
-		if v.Info.MediaType == "" {
+		if v.Info.MediaType == "" || v.Info.MediaType == "url" {
 			if v.RawMessage.ExtendedTextMessage != nil {
 				if v.RawMessage.ExtendedTextMessage.Text != nil {
 					content = *v.RawMessage.ExtendedTextMessage.Text
@@ -68,6 +69,8 @@ func eventHandler(evt interface{}) {
 				Author:      author,
 				Color:       0x25D366,
 			})
+
+			fmt.Println("Sent to Discord")
 
 			return
 		}
